@@ -50,9 +50,3 @@ vendor
 
 # Node
 node_modules
-
-# Built Files
-app/assets/js/templates.js
-dist/
-tmp/
-.tmp/
