@@ -1,0 +1,15 @@
+html, body, .fittext { height: 100%; }
+
+.fittext {
+	margin-top: -82px;
+	cursor: pointer;
+}
+
+.timer {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 50%;
+	margin-top: -10px;
+	text-align: center;
+}
