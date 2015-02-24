@@ -1,52 +1,7 @@
 (function (win, doc, $) {
 	var $timer,
-		$container;
-
-	var Countdown = function (options) {
-		var timer,
-			instance = this,
-			status = 'stopped',
-			seconds = options.seconds || 10,
-			updateStatus = options.onUpdateStatus || function () {},
-			counterEnd = options.onCounterEnd || function () {},
-			counterReset = options.onCounterReset || function () {};
-
-		function decrementCounter() {
-			updateStatus(seconds);
-			if (seconds === 0) {
-				counterEnd();
-				instance.stop('finished');
-			}
-			seconds--;
-		}
-
-		this.start = function () {
-			decrementCounter();
-			timer = setInterval(decrementCounter, 1000);
-			status = 'running';
-		};
-
-		this.stop = function (status) {
-			clearInterval(timer);
-			status = status || 'stopped';
-		};
-
-		this.restart = function () {
-			instance.reset();
-			instance.start();
-		};
-
-		this.reset = function () {
-			clearInterval(timer);
-			seconds = options.seconds || 10;
-			counterReset(seconds);
-			instance.stop();
-		};
-
-		this.status = function () {
-			return status;
-		};
-	};
+		$container,
+		alarm;
 
 	var resizeTimer = function () {
 		var height = $timer.height() / 2;
@@ -58,7 +13,7 @@
 		var $target = $(e.target);
 
 		if ($target.hasClass('navbar-header') || $target.hasClass('navbar-toggle') || $target.hasClass('navbar-nav') || $target.is('li') || $target.is('a')) {
-			// console.log('Don\'t do anything when the navbar is clicked');
+			// Don't do anything when the navbar is clicked
 		}
 		else if (status === 'stopped') {
 			myCounter.start();
@@ -69,8 +24,28 @@
 	};
 
 	var startOver = function () {
-		console.log('startOver');
 		myCounter.reset();
+		$timer
+			.text(' to start the timer')
+			.prepend($('<span />', {
+				'class': 'hidden-md hidden-lg',
+				text: 'Tap'
+			}))
+			.prepend($('<span />', {
+				'class': 'hidden-xs hidden-sm',
+				text: 'Click'
+			}));
+
+		$container.removeClass(function(){
+			var classList = '',
+			classes = this.className.split(' ');
+			for (var i = 0; i < classes.length; i++) {
+				if((/(bg-)\w+/).test(classes[i])) {
+					classList += classes[i] + ' ';
+				}
+			}
+			return classList;
+		});
 	};
 
 	var counterUpdate = function (seconds) {
@@ -88,29 +63,28 @@
 		}));
 
 		$container.addClass('bg-' + klass);
+		resizeTimer();
 	};
 
 	var counterFinished = function () {
 		var times = 0;
-		$timer.html($('<span />', {
+
+		alarm.volume = 0.3;
+		alarm.load();
+		alarm.play();
+
+		$timer.addClass('blink').html($('<span />', {
 			text: 'TIME\'S UP!',
 			'class': 'text-danger'
 		}));
 
-		var hide = setInterval(function(){
-			$timer.hide();
-		},500);
-		var show = setTimeout(setInterval(function(){
-			$timer.show();
-			times++;
-			if(times === 3) {
-				clearInterval(hide);
-				clearInterval(show);
-			}
-		}, 500), 500);
+		setTimeout(function(){
+			alarm.pause();
+		}, 1500);
 	};
 
 	var myCounter = new Countdown({
+		seconds: 2,
 		onUpdateStatus: counterUpdate,
 		onCounterEnd: counterFinished,
 		onCounterReset: counterUpdate
@@ -119,19 +93,15 @@
 	// On load
 	$(function () {
 		$timer = $('.timer');
-		$container = $('.fittext');
+		$container = $('.timer-container');
+		alarm = $('audio')[0];
 
 		win.fitText($timer, 0.6);
 		resizeTimer();
 
 		$(win).on('resize', resizeTimer);
-		$(win).on('rotate', resizeTimer);
-
 		$container.on('click', startStop);
-		$container.on('tap', startStop);
-
 		$container.on('dblclick', startOver);
-		$container.on('press', startOver);
 	});
 
 })(window, document, jQuery);
