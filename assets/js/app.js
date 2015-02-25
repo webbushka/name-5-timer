@@ -84,7 +84,7 @@
 	};
 
 	var myCounter = new Countdown({
-		seconds: 2,
+		seconds: 10,
 		onUpdateStatus: counterUpdate,
 		onCounterEnd: counterFinished,
 		onCounterReset: counterUpdate
@@ -95,6 +95,7 @@
 		$timer = $('.timer');
 		$container = $('.timer-container');
 		alarm = $('audio')[0];
+		alarm.load();
 
 		win.fitText($timer, 0.6);
 		resizeTimer();
